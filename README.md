@@ -9,6 +9,7 @@ Il vous suffira ensuite d'ouvrir un fichier .ch8 pour que l'emulateur lance le j
 ## Touches:
 
 Voici un shema du mappage des touches:
+
 <br/>Nspire -> CHIP8
 <br/>ABCD -> 123C
 <br/>HIJK -> 456D
