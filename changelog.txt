@@ -1,0 +1,14 @@
+v1.2 (publique):
+	-ajout d'un menu
+	-ajout d'un debugger pas a pas
+
+v1.1 (publique):
+	-gestion des touches
+
+v1.0 (publique):
+	-ajout du support de fichier rom .ch8
+	-augmentation de la vitesse
+	-bugfix
+
+v0.1 (non-publique):
+	-moteur de jeu
