@@ -1,3 +1,7 @@
+v1.2.2 (publique):
+	-ajout de l'affichage du caracter $ devant les valeurs hexadecimales
+	-bugfix
+
 v1.2.1 (publique):
 	-changement du nom des registres
 	-affichage d'une mauvaise adresse pour jump et jumpi corrige

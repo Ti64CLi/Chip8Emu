@@ -432,11 +432,11 @@ void dispDebug(Uint16 *history, int *adresse)
 			}
 		}
 		char bufReg[20] = {0};
-		sprintf(bufReg, "r%X = %2.2X", i, (int)cpu.V[i]);
-		nSDL_DrawString(ecran, font, 262, yregistre, bufReg);
+		sprintf(bufReg, "r%d = $%2.2X", i, (int)cpu.V[i]);
+		nSDL_DrawString(ecran, font, 257, yregistre, bufReg);
 		yregistre += (nSDL_GetStringHeight(font, bufReg) + 2);
 	}
-	nSDL_DrawString(ecran, font, 262, yregistre, "I = %2.2X", (int)cpu.I);
+	nSDL_DrawString(ecran, font, 257, yregistre, "I = $%4.4X", (int)cpu.I);
 	SDL_Flip(ecran);
 	nSDL_FreeFont(font);
 }
