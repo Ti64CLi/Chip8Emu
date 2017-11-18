@@ -18,7 +18,7 @@ int debugWaitKey();
 
 char *convertOpcodeAsm(int, char *, Uint16);
 
-Uint16 pc;
+Uint16 pclast;
 
 int main(int argc, char *argv[])
 {
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
 	   for(compteur=0;compteur<vitessecpu && continuer==1;compteur++)  //Si continuer=0, on quitte l'émulateur
 	   {
-			pc = cpu.pc;
+			pclast = cpu.pc;
 			opcode = recupererOpcode(); //recupere l'opcode
 			continuer=interpreterOpcode(opcode); //puis l'interprete
 
@@ -289,20 +289,35 @@ int menu(int *fps, int *vitessecpu)  // merci a Alien_ pour cette fonction. Amel
                             }
                         case SDLK_5:
                             {
-                                continuer = 0;
-                                ret = 0;
+								if(select == 5)
+								{
+									continuer = 0;
+									ret = 0;
+								}
+								else
+									select = 5;
                                 break;
                             }
                         case SDLK_3:
                             {
-                                continuer = 0;
-                                ret = 1;
+								if(select == 3)
+								{
+									continuer = 0;
+									ret = 1;
+								}
+								else
+									select = 3;
                                 break;
                             }
 						case SDLK_4:
 						{
-							continuer = 0;
-							ret = 2;
+							if(select == 4)
+							{
+								continuer = 0;
+								ret = 2;
+							}
+							else
+								select = 4;
 							break;
 						}
                         case SDLK_PLUS:
@@ -311,7 +326,7 @@ int menu(int *fps, int *vitessecpu)  // merci a Alien_ pour cette fonction. Amel
                                 {
                                     ((*fps) < 50 ? (*fps)++ : 0);
                                 }
-                                else
+                                else if(select == 2)
                                 {
                                     ((*vitessecpu) < 50 ? (*vitessecpu)++ : 0);
                                 }
@@ -324,13 +339,32 @@ int menu(int *fps, int *vitessecpu)  // merci a Alien_ pour cette fonction. Amel
                                 {
                                    ((*fps) > 0 ? (*fps)-- : 0);
                                 }
-                                else
+                                else if(select == 2)
                                 {
                                     ((*vitessecpu) > 1 ? (*vitessecpu)-- : 0);
                                 }
 								SDL_Delay(100);
                                 break;
                             }
+						case SDLK_l:
+						{
+							if(select == 3)
+							{
+								continuer = 0;
+								ret = 1;
+							}
+							else if(select == 4)
+							{
+								continuer = 0;
+								ret = 2;
+							}
+							else if(select == 5)
+							{
+								continuer = 0;
+								ret = 0;
+							}
+							break;
+						}
 						/*case SDLK_DELETE:
 							{
 								//pour reset le jeu en cours
@@ -344,6 +378,7 @@ int menu(int *fps, int *vitessecpu)  // merci a Alien_ pour cette fonction. Amel
              default:
                  break;
          }
+		 SDL_Delay(100);
 
          SDL_FillRect(ecran,NULL, SDL_MapRGB(ecran->format, 0,0,0));
 		 nSDL_DrawString(ecran,font,160-ltitre/2,20,"CHIP8 Emulateur - Configuration");
@@ -355,11 +390,11 @@ int menu(int *fps, int *vitessecpu)  // merci a Alien_ pour cette fonction. Amel
 		 lfps = nSDL_GetStringWidth((select == 1 ? (fontselect) : (font)), textfps);
 		 lvitessecpu = nSDL_GetStringWidth((select == 1 ? (font) : (fontselect)), textvitessecpu);
          nSDL_DrawString(ecran,(select == 1 ? (fontselect) : (font)),160-lfps/2,75,textfps);
-         nSDL_DrawString(ecran,(select == 1 ? (font) : (fontselect)),160-lvitessecpu/2,105,textvitessecpu);
+         nSDL_DrawString(ecran,(select == 2 ? (fontselect) : (font)),160-lvitessecpu/2,105,textvitessecpu);
 
-        nSDL_DrawString(ecran,font,160-(lquitter/2),195,"5- QUITTER L'EMULATEUR");
-		nSDL_DrawString(ecran,font,160-(lload/2),165,"4- CHARGER LE JEU AVEC LE DEBUGGER");
-        nSDL_DrawString(ecran,font,160-(lretour/2),135,"3- CHARGER LE JEU");
+        nSDL_DrawString(ecran,(select == 5 ? (fontselect) : (font)),160-(lquitter/2),195,"5- QUITTER L'EMULATEUR");
+		nSDL_DrawString(ecran,(select == 4 ? (fontselect) : (font)),160-(lload/2),165,"4- CHARGER LE JEU AVEC LE DEBUGGER");
+        nSDL_DrawString(ecran,(select == 3 ? (fontselect) : (font)),160-(lretour/2),135,"3- CHARGER LE JEU");
 		//nSDL_DrawString(ecran,font,POSX(lreset),210,"DEL- SUPPRIMER LA SAUVEGARDE");
 
         SDL_Flip(ecran);
@@ -401,6 +436,7 @@ void dispDebug(Uint16 *history, int *adresse)
 		nSDL_DrawString(ecran, font, 262, yregistre, bufReg);
 		yregistre += (nSDL_GetStringHeight(font, bufReg) + 2);
 	}
+	nSDL_DrawString(ecran, font, 262, yregistre, "I = %2.2X", (int)cpu.I);
 	SDL_Flip(ecran);
 	nSDL_FreeFont(font);
 }
@@ -422,7 +458,7 @@ void scroll(Uint16 *history, int *adresse, Uint16 opcode)
 		if((history[i] == 0) && (!change))
 		{
             history[i] = opcode;
-			adresse[i] = pc;
+			adresse[i] = pclast;
 			change = 1;
 			if(i == 0)
 				break;
@@ -435,7 +471,7 @@ void scroll(Uint16 *history, int *adresse, Uint16 opcode)
 				adresse[j] = adresse[j+1];
 			}
 			history[4] = opcode;
-			adresse[4] = pc;
+			adresse[4] = pclast;
 			
 		}
 
@@ -469,13 +505,17 @@ char *convertOpcodeAsm(int adresse, char *buf, Uint16 opcode)
 {
 // ************** !!! AJOUTER TOUTES LES ADRESSES !!! ************** //
 		int i = recupererAction(opcode);
+		
+		int b3 = (opcode&(0x0F00))>>8;  //on prend les 4 bits représentant X
+		int b2 = (opcode&(0x00F0))>>4;  //idem pour Y
+		int b1 = (opcode&(0x000F));     //idem
 
-		int nombre3 = ((opcode&(0x0F00))>>8) + ((opcode&(0x00F0))>>4) + (opcode&(0x000F));
-		int nombre2 = ((opcode&(0x00F0))>>4) + (opcode&(0x000F));
-		int nombre1 = opcode&(0x0F00);
+		int nombre3 = (b3<<8)+(b2<<4)+b1;
+		int nombre2 = (b2<<4)+b1;
+		int nombre1 = b1;
 
-		int reg1 = (opcode&(0x0F00))>>8;
-		int reg2 = (opcode&(0x00F0))>>4;
+		int reg1 = b3;
+		int reg2 = b2;
 
 		switch(i) // avec des morceaux de https://github.com/craigthomas/Chip8Assembler
 		{
@@ -495,7 +535,7 @@ char *convertOpcodeAsm(int adresse, char *buf, Uint16 opcode)
                 break;
             }
 			case 3:{
-            //1NNN effectue un saut à l'adresse 1NNN.
+            //1NNN effectue un saut à l'adresse NNN.
                 sprintf(buf,"0x%4.4X    %4.4X   JUMP $%3.3X", adresse, opcode, nombre3); // ajouter l'adresse du saut
                 break;
             }
@@ -560,7 +600,7 @@ char *convertOpcodeAsm(int adresse, char *buf, Uint16 opcode)
                 break;
             }
 			case 16:{
-                //8XY6 décale (shift) VX à droite de 1 bit. VF est fixé à la valeur du bit de poids faible de VX avant le décalage.
+                //8X06 décale (shift) VX à droite de 1 bit. VF est fixé à la valeur du bit de poids faible de VX avant le décalage.
                 sprintf(buf,"0x%4.4X    %4.4X   SHR r%1.1X", adresse, opcode, reg1);
                 break;
             }
@@ -570,7 +610,7 @@ char *convertOpcodeAsm(int adresse, char *buf, Uint16 opcode)
                 break;
             }
 			case 18:{
-                //8XYE décale (shift) VX à gauche de 1 bit. VF est fixé à la valeur du bit de poids fort de VX avant le décalage.
+                //8X0E décale (shift) VX à gauche de 1 bit. VF est fixé à la valeur du bit de poids fort de VX avant le décalage.
 				sprintf(buf,"0x%4.4X    %4.4X   SHL r%1.1X", adresse, opcode, reg1);
                 break;
             }
@@ -580,13 +620,13 @@ char *convertOpcodeAsm(int adresse, char *buf, Uint16 opcode)
                 break;
             }
 			case 20:{
-            //ANNN affecte NNN à I.
+				//ANNN affecte NNN à I.
                 sprintf(buf,"0x%4.4X    %4.4X   LOADI $%3.3X", adresse, opcode, nombre3);
                 break;
             }
 			case 21:{
 				//BNNN passe à l'adresse NNN + V0.
-				sprintf(buf,"0x%4.4X    %4.4X   JUMPI $%3.3X", adresse, opcode, nombre3);
+				sprintf(buf,"0x%4.4X    %4.4X   JUMPI $%3.3X", adresse, opcode, nombre3 + cpu.V[0]);
 				break;
             }
 			case 22:{

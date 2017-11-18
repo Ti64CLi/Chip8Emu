@@ -1,3 +1,9 @@
+v1.2.1 (publique):
+	-changement du nom des registres
+	-affichage d'une mauvaise adresse pour jump et jumpi corrige
+	-ajout de l'affichage du registre I
+	-affichage d'une mauvaise adresse de l'opcode en cours d'execution corrige
+
 v1.2 (publique):
 	-ajout d'un menu
 	-ajout d'un debugger pas a pas
